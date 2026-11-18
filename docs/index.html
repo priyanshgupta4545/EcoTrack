@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoTrack – Smart Sustainability & Environmental Impact Tracker 🌱</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #10B981;
+      --primary-dark: #065F46;
+      --primary-deep: #064E3B;
+      --primary-light: #D1FAE5;
+      --accent-blue: #0284C7;
+      --accent-amber: #F59E0B;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --bg-page: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --border: #E2E8F0;
+      --radius: 16px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 6px 20px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Navbar */
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-icon {
+      font-size: 2rem;
+      background: var(--primary-light);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--primary-deep);
+    }
+    .brand-subtitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .nav-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-pill {
+      background: #F1F5F9;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-pill.green { background: var(--primary-light); color: var(--primary-dark); }
+    .stat-pill.amber { background: #FEF3C7; color: #92400E; }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem 1.5rem;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%);
+      color: #FFFFFF;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.2);
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "🌱";
+      position: absolute;
+      right: 20px;
+      bottom: -20px;
+      font-size: 8rem;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--primary-light);
+      max-width: 700px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #A7F3D0;
+    }
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .kpi-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .kpi-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .kpi-value {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .kpi-unit {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .kpi-footer {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    /* Content Layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+    }
+    .card-caption {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    /* Activity Form */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: var(--text-main);
+    }
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    button.btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: background 0.2s, transform 0.1s;
+    }
+    button.btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Live Feed */
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .activity-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .act-icon {
+      font-size: 1.4rem;
+      background: var(--bg-page);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .act-name { font-weight: 700; font-size: 0.92rem; }
+    .act-meta { font-size: 0.78rem; color: var(--text-muted); }
+    .act-impact { text-align: right; }
+    .act-co2 { font-weight: 800; font-size: 0.9rem; color: var(--primary); }
+    .act-water { font-size: 0.75rem; color: var(--accent-blue); }
+
+    /* Recycling Section */
+    .recycling-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .recycling-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #FFFFFF;
+    }
+    .recycling-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+    .tag.yes { background: #D1FAE5; color: #065F46; }
+    .tag.cond { background: #FEF3C7; color: #92400E; }
+    .tag.no { background: #FEE2E2; color: #991B1B; }
+
+    /* Badges */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      text-align: center;
+    }
+    .badge-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: #FFFFFF;
+    }
+    .badge-box.unlocked {
+      border-color: #A7F3D0;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);
+    }
+    .badge-icon { font-size: 2.2rem; margin-bottom: 6px; }
+    .badge-name { font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
+    .badge-status { font-size: 0.72rem; color: var(--primary-dark); font-weight: 600; margin-top: 4px; }
+
+    /* Footer */
+    footer {
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">🌱</div>
+        <div>
+          <div class="brand-title">EcoTrack</div>
+          <div class="brand-subtitle">Smart Sustainability Platform</div>
+        </div>
+      </a>
+      <div class="nav-stats">
+        <div class="stat-pill green">
+          <span>🏆 EcoScore:</span> <span id="headerEcoScore">94</span>/100
+        </div>
+        <div class="stat-pill amber">
+          <span>🔥</span> <span id="headerStreak">7</span>-Day Streak
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Banner -->
+    <section class="hero">
+      <div class="hero-badge">Interactive Live Demonstration</div>
+      <h1>Track Daily Habits. Quantify Real Impact.</h1>
+      <p>Log eco-friendly actions, compute transparent greenhouse gas emissions avoided, analyze weekly trends, and learn proper recycling rules.</p>
+    </section>
+
+    <!-- Key Metrics Grid -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Actions Logged</span>
+          <div class="kpi-icon" style="background:#D1FAE5;">🌿</div>
+        </div>
+        <div class="kpi-value" id="kpiTotalActions">29</div>
+        <div class="kpi-footer">↑ 14% vs last week</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">CO2 Avoided</span>
+          <div class="kpi-icon" style="background:#E0F2FE;">☁️</div>
+        </div>
+        <div class="kpi-value"><span id="kpiTotalCO2">38.4</span> <span class="kpi-unit">kg</span></div>
+        <div class="kpi-footer">≈ 1.8 Urban tree-years</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Water Conserved</span>
+          <div class="kpi-icon" style="background:#E0F2FE;">💧</div>
+        </div>
+        <div class="kpi-value"><span id="kpiTotalWater">8,950</span> <span class="kpi-unit">L</span></div>
+        <div class="kpi-footer">≈ 60 Bathtubs clean water</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Waste Diverted</span>
+          <div class="kpi-icon" style="background:#FEF3C7;">♻️</div>
+        </div>
+        <div class="kpi-value"><span id="kpiTotalWaste">6.7</span> <span class="kpi-unit">kg</span></div>
+        <div class="kpi-footer">≈ 270 Plastic bottles</div>
+      </div>
+    </section>
+
+    <!-- Layout: Chart & Tracker Form -->
+    <div class="two-col">
+      <!-- Left: Chart & Activity Feed -->
+      <div>
+        <div class="card">
+          <div class="card-title">Weekly Sustainability Progress</div>
+          <div class="card-caption">Daily carbon avoided (kg CO2e) over the current week</div>
+          <div style="height: 280px; position: relative;">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Recent Activity Feed</div>
+          <div class="card-caption">Real-time log of your verified eco-friendly habits</div>
+          <div id="activityFeed">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Quick Logger & Category Breakdown -->
+      <div>
+        <div class="card">
+          <div class="card-title">⚡ Quick Log Activity</div>
+          <div class="card-caption">Choose an action to record your daily footprint reduction</div>
+
+          <form id="logForm">
+            <div class="form-group">
+              <label for="activitySelect">Select Activity Preset</label>
+              <select id="activitySelect">
+                <option value="walk_cycle" data-cat="Transportation" data-unit="km" data-co2="0.170" data-water="0" data-waste="0" data-energy="0">🚲 Walked / Cycled instead of Car (km)</option>
+                <option value="reusable_bottle" data-cat="Waste & Recycling" data-unit="refills" data-co2="0.082" data-water="3" data-waste="0.025" data-energy="0.12">🍶 Used Reusable Water Bottle (refills)</option>
+                <option value="short_shower" data-cat="Water Conservation" data-unit="showers" data-co2="0.150" data-water="45" data-waste="0" data-energy="0.35">🚿 Short 5-Minute Shower (showers)</option>
+                <option value="plant_meal" data-cat="Sustainable Food" data-unit="meals" data-co2="1.800" data-water="1200" data-waste="0.1" data-energy="0.8">🥗 Plant-Based / Vegetarian Meal (meals)</option>
+                <option value="led_lights" data-cat="Energy Conservation" data-unit="hours" data-co2="0.040" data-water="0" data-waste="0" data-energy="0.10">💡 Switched Off Idle Electronics (hours)</option>
+                <option value="recycle_materials" data-cat="Waste & Recycling" data-unit="kg" data-co2="1.400" data-water="20" data-waste="1.0" data-energy="1.8">📦 Recycled Plastic, Paper or Cans (kg)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="actQty">Quantity</label>
+                <input type="number" id="actQty" min="0.5" step="0.5" value="2">
+              </div>
+              <div class="form-group">
+                <label for="actDate">Date</label>
+                <input type="date" id="actDate">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary">🌱 Record Eco Habit</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Category Distribution</div>
+          <div class="card-caption">Proportion of activities by environmental sector</div>
+          <div style="height: 230px; position: relative;">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical Recycling Guide Section -->
+    <section class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div class="card-title">🔍 Practical Recycling Decision Directory</div>
+          <div class="card-caption" style="margin-bottom:0;">Avoid contamination and "wishcycling" with practical sorting rules</div>
+        </div>
+        <div style="width: 280px;">
+          <input type="text" id="recycleSearch" placeholder="Search item (e.g. pizza, bottle)...">
+        </div>
+      </div>
+
+      <div class="recycling-grid" id="recyclingGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Achievement Badges -->
+    <section class="card">
+      <div class="card-title">🏆 Sustainability Badges & Milestones</div>
+      <div class="card-caption">Unlocked through verified daily environmental actions</div>
+      <div class="badge-grid">
+        <div class="badge-box unlocked">
+          <div class="badge-icon">🌱</div>
+          <div class="badge-name">Green Beginner</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+        <div class="badge-box unlocked">
+          <div class="badge-icon">🛡️</div>
+          <div class="badge-name">Plastic Warrior</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+        <div class="badge-box unlocked">
+          <div class="badge-icon">💧</div>
+          <div class="badge-name">Aqua Protector</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+        <div class="badge-box unlocked">
+          <div class="badge-icon">🚲</div>
+          <div class="badge-name">Clean Commuter</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+        <div class="badge-box unlocked">
+          <div class="badge-icon">🔥</div>
+          <div class="badge-name">Habit Builder</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+        <div class="badge-box unlocked">
+          <div class="badge-icon">🏆</div>
+          <div class="badge-name">Eco Champion</div>
+          <div class="badge-status">Unlocked ✨</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><b>EcoTrack</b> • Smart Sustainability & Environmental Impact Tracker</p>
+    <p style="margin-top: 4px; font-size: 0.8rem;">Full-stack Python Streamlit + SQLite edition and documentation available in the GitHub repository.</p>
+  </footer>
+
+  <script>
+    // -------------------------------------------------------------
+    // Initial State & Pre-seeded Sample Data
+    // -------------------------------------------------------------
+    let state = {
+      totalActions: 29,
+      totalCO2: 38.4,
+      totalWater: 8950,
+      totalWaste: 6.7,
+      streak: 7,
+      score: 94,
+      recentActivities: [
+        { name: "Walked or Cycled instead of Car", category: "Transportation", icon: "🚲", qty: 5, unit: "km", co2: 0.85, water: 0, date: "Today" },
+        { name: "Used Reusable Water Bottle", category: "Waste & Recycling", icon: "🍶", qty: 3, unit: "refills", co2: 0.25, water: 9, date: "Today" },
+        { name: "Chose Plant-Based Meal", category: "Sustainable Food", icon: "🥗", qty: 2, unit: "meals", co2: 3.60, water: 2400, date: "Yesterday" },
+        { name: "Short 5-Minute Shower", category: "Water Conservation", icon: "🚿", qty: 1, unit: "showers", co2: 0.15, water: 45, date: "Yesterday" },
+        { name: "Switched Off Idle Electronics", category: "Energy Conservation", icon: "💡", qty: 4, unit: "hours", co2: 0.16, water: 0, date: "2 days ago" }
+      ],
+      categories: {
+        "Transportation": 7,
+        "Waste & Recycling": 8,
+        "Water Conservation": 5,
+        "Sustainable Food": 5,
+        "Energy Conservation": 4
+      }
+    };
+
+    const recyclingItems = [
+      { item: "Plastic Water Bottles (#1 PETE)", tag: "Yes - Widely Recycled", class: "yes", rule: "Empty, rinse, crush flat, screw cap back on.", alt: "Stainless steel tumbler" },
+      { item: "Milk & Detergent Jugs (#2 HDPE)", tag: "Yes - High Value", class: "yes", rule: "Rinse completely, replace plastic cap.", alt: "Refillable bulk dispensers" },
+      { item: "Cardboard & Shipping Boxes", tag: "Yes - Keep Dry", class: "yes", rule: "Flatten completely. Keep dry to prevent mold.", alt: "Reuse for moving/gardening" },
+      { item: "Greasy Pizza Boxes", tag: "Separated / Conditional", class: "cond", rule: "Tear off clean lid for recycling; compost greasy base.", alt: "Pizzerias with paper liners" },
+      { item: "Plastic Grocery Bags (#4 LDPE)", tag: "Store Drop-off Only", class: "cond", rule: "DO NOT put in blue bin. Drop in supermarket collection bins.", alt: "Organic cotton tote bags" },
+      { item: "Styrofoam Packaging (#6 PS)", tag: "No - Rare Curbside", class: "no", rule: "Too brittle and light for municipal facilities.", alt: "Molded cardboard packaging" },
+      { item: "Aluminum Beverage Cans", tag: "Yes - 100% Recyclable", class: "yes", rule: "Rinse remaining liquid. Can be recycled indefinitely.", alt: "Refill stations" },
+      { item: "Batteries (Lithium & Alkaline)", tag: "Hazardous Drop-off", class: "no", rule: "Never trash or put in curbside bins. Tape terminals and bring to depot.", alt: "Rechargeable NiMH cells" },
+      { item: "Takeout Paper Coffee Cups", tag: "No - Landfill", class: "no", rule: "Inner polyethylene wax liner cannot be separated at paper mills.", alt: "Insulated travel mug" }
+    ];
+
+    // Set today's date in input
+    document.getElementById("actDate").valueAsDate = new Date();
+
+    // -------------------------------------------------------------
+    // Chart.js Implementations
+    // -------------------------------------------------------------
+    const weeklyCtx = document.getElementById("weeklyChart").getContext("2d");
+    const weeklyChart = new Chart(weeklyCtx, {
+      type: "bar",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "CO2 Avoided (kg)",
+          data: [4.2, 5.8, 3.9, 6.4, 7.1, 5.2, 5.8],
+          backgroundColor: "#10B981",
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { grid: { color: "#F1F5F9" }, ticks: { font: { family: "Plus Jakarta Sans" } } },
+          x: { grid: { display: false }, ticks: { font: { family: "Plus Jakarta Sans" } } }
+        }
+      }
+    });
+
+    const categoryCtx = document.getElementById("categoryChart").getContext("2d");
+    const categoryChart = new Chart(categoryCtx, {
+      type: "doughnut",
+      data: {
+        labels: Object.keys(state.categories),
+        datasets: [{
+          data: Object.values(state.categories),
+          backgroundColor: ["#10B981", "#059669", "#0284C7", "#F59E0B", "#8B5CF6"],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom", labels: { boxWidth: 12, font: { family: "Plus Jakarta Sans", size: 11 } } }
+        },
+        cutout: "65%"
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Render Functions
+    // -------------------------------------------------------------
+    function renderFeed() {
+      const feed = document.getElementById("activityFeed");
+      feed.innerHTML = state.recentActivities.map(a => `
+        <div class="activity-item">
+          <div class="activity-left">
+            <div class="act-icon">${a.icon}</div>
+            <div>
+              <div class="act-name">${a.name}</div>
+              <div class="act-meta">${a.qty} ${a.unit} • ${a.date}</div>
+            </div>
+          </div>
+          <div class="act-impact">
+            <div class="act-co2">-${a.co2.toFixed(2)} kg CO2</div>
+            ${a.water > 0 ? `<div class="act-water">${a.water} L water</div>` : ''}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderRecycling(filter = "") {
+      const grid = document.getElementById("recyclingGrid");
+      const filtered = recyclingItems.filter(i => 
+        i.item.toLowerCase().includes(filter.toLowerCase()) || 
+        i.rule.toLowerCase().includes(filter.toLowerCase())
+      );
+      grid.innerHTML = filtered.map(i => `
+        <div class="recycling-item">
+          <div class="recycling-header">
+            <span style="font-weight:700; font-size:0.95rem;">${i.item}</span>
+            <span class="tag ${i.class}">${i.tag}</span>
+          </div>
+          <div style="font-size:0.82rem; color:#475569; margin-bottom:4px;"><b>Rule:</b> ${i.rule}</div>
+          <div style="font-size:0.78rem; color:#059669; font-weight:600;">🌱 <b>Alternative:</b> ${i.alt}</div>
+        </div>
+      `).join("");
+    }
+
+    // -------------------------------------------------------------
+    // Form Submission & Live Updates
+    // -------------------------------------------------------------
+    document.getElementById("logForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const select = document.getElementById("activitySelect");
+      const opt = select.selectedOptions[0];
+      const qty = parseFloat(document.getElementById("actQty").value) || 1;
+      
+      const co2Unit = parseFloat(opt.dataset.co2) || 0;
+      const waterUnit = parseFloat(opt.dataset.water) || 0;
+      const wasteUnit = parseFloat(opt.dataset.waste) || 0;
+
+      const co2Saved = co2Unit * qty;
+      const waterSaved = waterUnit * qty;
+      const wasteSaved = wasteUnit * qty;
+
+      state.totalActions += 1;
+      state.totalCO2 = parseFloat((state.totalCO2 + co2Saved).toFixed(1));
+      state.totalWater += Math.round(waterSaved);
+      state.totalWaste = parseFloat((state.totalWaste + wasteSaved).toFixed(1));
+
+      // Update UI
+      document.getElementById("kpiTotalActions").innerText = state.totalActions;
+      document.getElementById("kpiTotalCO2").innerText = state.totalCO2;
+      document.getElementById("kpiTotalWater").innerText = state.totalWater.toLocaleString();
+      document.getElementById("kpiTotalWaste").innerText = state.totalWaste;
+
+      // Add to feed
+      const icon = opt.text.split(" ")[0];
+      const cleanName = opt.text.substring(icon.length + 1).split("(")[0].trim();
+      state.recentActivities.unshift({
+        name: cleanName,
+        category: opt.dataset.cat,
+        icon: icon,
+        qty: qty,
+        unit: opt.dataset.unit,
+        co2: co2Saved,
+        water: Math.round(waterSaved),
+        date: "Just now"
+      });
+      if (state.recentActivities.length > 6) state.recentActivities.pop();
+      renderFeed();
+
+      // Update Category Chart
+      const cat = opt.dataset.cat;
+      if (state.categories[cat]) {
+        state.categories[cat] += 1;
+      } else {
+        state.categories[cat] = 1;
+      }
+      categoryChart.data.datasets[0].data = Object.values(state.categories);
+      categoryChart.update();
+
+      // Update Weekly Chart last bar
+      const lastIdx = weeklyChart.data.datasets[0].data.length - 1;
+      weeklyChart.data.datasets[0].data[lastIdx] = parseFloat((weeklyChart.data.datasets[0].data[lastIdx] + co2Saved).toFixed(1));
+      weeklyChart.update();
+
+      alert(`🌱 Successfully logged ${cleanName}! Saved ${co2Saved.toFixed(2)} kg CO2e.`);
+    });
+
+    // Recycling Search
+    document.getElementById("recycleSearch").addEventListener("input", function(e) {
+      renderRecycling(e.target.value);
+    });
+
+    // Initialize
+    renderFeed();
+    renderRecycling();
+  </script>
+</body>
+</html>
